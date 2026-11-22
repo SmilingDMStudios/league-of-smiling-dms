@@ -3,6 +3,7 @@
 const $=s=>document.querySelector(s), R=a=>a[Math.random()*a.length|0];
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const store={get(k,d){try{const v=localStorage.getItem('sdm-'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('sdm-'+k,JSON.stringify(v))}catch(e){}}};
+const NICK=()=>String(window.__lsdNick||'').trim().slice(0,40); const byLine=(verb)=>NICK()?`<p class="made-by">${verb} by ${esc(NICK())}</p>`:'';
 let tt;const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1600)};
 const copy=async(txt,msg='Copied')=>{try{await navigator.clipboard.writeText(txt);toast(msg)}catch(e){toast('Copy blocked: select and copy manually')}};
 const ICON={copy:'<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></svg>',star:'<svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>'};
@@ -159,7 +160,7 @@ ${line('Senses',(m.senses?m.senses+', ':'')+'passive Perception '+passive(m))}${
 ${m.traits.map(i=>`<p class="ac"><b>${esc(i.n)}.</b> ${esc(i.d).replace(/\n/g,'<br>')}</p>`).join('')}
 ${block('Actions',m.actions,m)}${block('Bonus Actions',m.bonus,m)}${block('Reactions',m.reactions,m)}
 ${block('Legendary Actions',m.legendary,m,m.legN?`The ${esc(m.name.replace(/^the /i,'')).toLowerCase()} can take ${m.legN} legendary actions, choosing from the options below. Only one legendary action can be used at a time and only at the end of another creature's turn. Spent legendary actions are regained at the start of each turn.`:'')}`};
-const renderSB=()=>{$('#sb').innerHTML=sbHTML(M);store.set('draft',M)};
+const renderSB=()=>{$('#sb').innerHTML=sbHTML(M)+byLine('Created');store.set('draft',M)};
 const renderAbil=()=>{$('#abil').innerHTML=AB.map((a,i)=>`<label>${a}<input type="number" min="1" max="30" data-ab="${i}" value="${M.ab[i]}" aria-label="${a} score"><span id="mod${i}">${sg(mod(M.ab[i]))}</span></label>`).join('')};
 const renderChecks=()=>{$('#saves').innerHTML='<b style="width:100%;font-size:14px">Saving throws</b>'+AB.map((a,i)=>`<label><input type="checkbox" data-sv="${i}" ${M.saves.includes(i)?'checked':''}>${a}</label>`).join('');
 $('#skills').innerHTML='<b style="width:100%;font-size:14px">Proficient skills</b>'+SK.map((s,i)=>`<label><input type="checkbox" data-sk="${i}" ${M.skills.includes(i)?'checked':''}>${s[0]}</label>`).join('');
@@ -573,7 +574,7 @@ const CLASSBLURB={barbarian:'A fierce warrior fueled by primal Rage.',bard:'An i
 const SPECBLURB={dragonborn:'Proud descendants of dragons with a breath weapon.',dwarf:'Hardy folk of stone and forge, tough as their mountains.',elf:'Graceful, long-lived people with fey ancestry.',gnome:'Small, clever and curious inventors and illusionists.',goliath:'Towering giant-kin who can grow larger in battle.',halfling:'Small, brave and remarkably lucky.',human:'Ambitious, adaptable and found everywhere.',orc:'Powerful, enduring and relentless in a fight.',tiefling:'Touched by fiendish heritage, with innate magic.'};
 const CLSPRIM={barbarian:['STR','CON','DEX'],bard:['CHA','DEX','CON'],cleric:['WIS','CON','STR'],druid:['WIS','CON','DEX'],fighter:['STR','CON','DEX'],monk:['DEX','WIS','CON'],paladin:['STR','CHA','CON'],ranger:['DEX','WIS','CON'],rogue:['DEX','INT','CON'],sorcerer:['CHA','CON','DEX'],warlock:['CHA','CON','DEX'],wizard:['INT','CON','DEX']};
 const uid=()=>Math.random().toString(36).slice(2,10);
-const newChar=()=>({id:uid(),name:'',player:'',cls:'fighter',level:1,skills:[],expert:[],bg:'Soldier',bgMode:'21',bgPlus:{STR:2,CON:1},species:'human',sub:'',size:'Medium',vfeat:'skilled',xskills:[],method:'array',base:{STR:15,DEX:13,CON:14,INT:8,WIS:12,CHA:10},other:{STR:0,DEX:0,CON:0,INT:0,WIS:0,CHA:0},eqC:0,eqB:0,inv:null,coins:{pp:0,gp:0,sp:0,cp:0},spells:{can:[],prep:[],mi:[]},hpManual:'',hp:{cur:null,temp:0},hdUsed:0,slotsUsed:[0,0,0,0,0,0,0,0,0],death:{s:0,f:0},insp:false,align:'',looks:'',traits:'',ideals:'',bonds:'',flaws:'',story:'',notes:'',created:Date.now()});
+const newChar=()=>({id:uid(),name:'',player:NICK(),cls:'fighter',level:1,skills:[],expert:[],bg:'Soldier',bgMode:'21',bgPlus:{STR:2,CON:1},species:'human',sub:'',size:'Medium',vfeat:'skilled',xskills:[],method:'array',base:{STR:15,DEX:13,CON:14,INT:8,WIS:12,CHA:10},other:{STR:0,DEX:0,CON:0,INT:0,WIS:0,CHA:0},eqC:0,eqB:0,inv:null,coins:{pp:0,gp:0,sp:0,cp:0},spells:{can:[],prep:[],mi:[]},hpManual:'',hp:{cur:null,temp:0},hdUsed:0,slotsUsed:[0,0,0,0,0,0,0,0,0],death:{s:0,f:0},insp:false,align:'',looks:'',traits:'',ideals:'',bonds:'',flaws:'',story:'',notes:'',created:Date.now()});
 let CHARS=store.get('chars',{}),CUR=store.get('curChar',null),CSTEP=0,CVIEW='build',RLOG=[],cOpen=null;
 const cur=()=>CHARS[CUR];
 const saveChars=()=>{store.set('chars',CHARS);store.set('curChar',CUR)};
@@ -803,7 +804,7 @@ ${w.charges?`<p class="ac"><b>Charges.</b> The weapon has ${w.charges} charges a
 ${w.custom.filter(c=>c.n||c.d).map(c=>`<p class="ac"><b>${esc(c.n||'Ability')}.</b> ${esc(c.d)}</p>`).join('')}
 ${w.abil.includes('sentient')?`<p class="ac"><b>Sentience.</b> Intelligence ${w.sentient.int}, Wisdom ${w.sentient.wis}, Charisma ${w.sentient.cha}. It is ${esc(w.sentient.pers||'quiet and watchful')} and wants to ${esc(w.sentient.goal||'serve a worthy wielder')}.</p>`:''}
 ${w.curse?`<p class="ac"><b>Curse.</b> ${esc((WCURSE.find(c=>c[0]===w.curse)||['',''])[1])}</p>`:''}`};
-const wtext=w=>wcardHTML(w).replace(/<hr>/g,'\n').replace(/<\/p>|<\/h3>|<\/div>/g,'\n').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&#39;|&quot;/g,"'").replace(/\n{2,}/g,'\n').trim();
+const wtext=w=>(wcardHTML(w)+byLine('Forged')).replace(/<hr>/g,'\n').replace(/<\/p>|<\/h3>|<\/div>/g,'\n').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&#39;|&quot;/g,"'").replace(/\n{2,}/g,'\n').trim();
 const renderW=()=>{const w=WC,b=wbase(w),pr=wprops(w),s=wscore(w),auto=wrar({...w,rar:'auto'});store.set('wcur',WC);
 $('#w-form').innerHTML=`<div class="row"><div class="span2"><label class="f" for="w-base">Base weapon</label><select id="w-base">${['simple','martial'].map(cat=>['melee','ranged'].map(k=>`<optgroup label="${cap(cat)} ${k} weapons">${WBASE.filter(([,v])=>v.cat===cat&&v.kind===k).map(([i,v])=>`<option value="${i}"${i===w.base?' selected':''}>${esc(v.n)} (${v.dmg} ${v.dt.toLowerCase()})</option>`).join('')}</optgroup>`).join('')).join('')}</select></div></div>
 <p class="muted" style="margin:-4px 0 10px">${esc(b.n)}: ${b.dmg} ${esc(b.dt.toLowerCase())}${b.dmg2?`, versatile ${b.dmg2}`:''} · ${esc(b.pr.join(', ')||'no properties')}${b.ms?` · mastery ${esc(b.ms)}`:''} · ${b.w} lb.${b.cost?' · '+b.cost:''}</p>
@@ -825,7 +826,7 @@ ${w.abil.includes('sentient')?`<div class="row" style="margin-top:8px"><div><lab
 <label class="f" for="w-look">Appearance</label><textarea id="w-look" data-w="look">${esc(w.look)}</textarea>
 <label class="f" for="w-lore" style="margin-top:8px">History</label><textarea id="w-lore" data-w="lore">${esc(w.lore)}</textarea><button class="btn sm" id="w-rlore" style="margin-top:6px">Random appearance and history</button>`;
 renderWCard()};
-const renderWCard=()=>{const w=WC,chars=Object.values(CHARS);$('#w-card').innerHTML=wcardHTML(w);
+const renderWCard=()=>{const w=WC,chars=Object.values(CHARS);$('#w-card').innerHTML=wcardHTML(w)+byLine('Forged');
 $('#w-meta').innerHTML=`<p class="muted" style="margin:0 0 8px">Power score ${wscore(w)} → suggested rarity <b>${wrar({...w,rar:'auto'})}</b>. Typical value: ${RVAL[wrar(w)]||'base price'}.</p>
 <div class="bar"><button class="btn pri" id="w-save">Save weapon</button>${DL?'<button class="btn" id="w-pdf">Download PDF</button>':''}<button class="btn" id="w-copy">Copy as text</button><button class="btn" id="w-new">New weapon</button></div>
 ${chars.length?`<div class="bar" style="margin-top:8px"><select id="w-to" style="flex:1;min-width:160px" aria-label="Character">${chars.map(c=>`<option value="${c.id}">${esc(c.name||'Unnamed')} (L${c.level} ${esc(clsOf(c).n)})</option>`).join('')}</select><button class="btn" id="w-give">Give to character</button></div>`:'<p class="muted" style="margin:8px 0 0;font-size:14px">Create a character in the Character Builder to hand this weapon to them.</p>'}
@@ -1037,7 +1038,7 @@ await DL.save({filename:(fname.replace(/[^\w\- '.]+/g,'').trim()||'Download.pdf'
 catch(err){const c=err&&err.code;if(c==='declined'){}else if(c==='rate_limited')toast('Your download is already starting');else if(c==='unavailable'||c==='not_granted'){DL=null;$('#mpdf').hidden=true;toast('Downloads aren\'t available here')}else toast('Could not build the PDF. Try again.')}
 finally{btn.disabled=false;btn.textContent=lbl}};
 const pdfFor=(m,btn)=>pdfMake(`<div class="sb" style="box-shadow:none;border-left:1px solid #d9c79a;border-right:1px solid #d9c79a">${sbHTML(m)}</div>`,(m.name||'Monster')+'.pdf',btn);
-$('#mpdf').onclick=e=>pdfFor(M,e.currentTarget);
+$('#mpdf').onclick=e=>pdfMake(`<div class="sb" style="box-shadow:none;border-left:1px solid #d9c79a;border-right:1px solid #d9c79a">${sbHTML(M)}${byLine('Created')}</div>`,(M.name||'Monster')+'.pdf',e.currentTarget);
 (async()=>{try{if(window.claude&&typeof claude.use==='function'){DL=await claude.use('downloads');if(DL){$('#mpdf').hidden=false;renderBest()}}}catch(e){}})();
 
 /* ---------- shared monster archive ---------- */
@@ -1067,7 +1068,7 @@ const m=sanitize(M);const body={m,by:$('#m-by').value.trim().slice(0,40),authorI
 const own=M.archiveId&&ARCH.find(a=>a.id===M.archiveId&&mine(a));const ref=own?DB.collection('archive').doc(M.archiveId):DB.collection('archive').doc();
 try{if(own&&ARCH.find(a=>a.id===M.archiveId).authorId)body.authorId=ARCH.find(a=>a.id===M.archiveId).authorId;await ref.set(body);M.archiveId=ref.id;store.set('draft',M);return own?'updated':'ok'}
 catch(err){const c=err&&err.code;if(c==='invalid_argument'){CANW=false;renderArch();return'readonly'}if(c==='quota_exceeded')return'full';return'err'}};
-$('#m-by').value=store.get('by','');$('#m-by').addEventListener('change',()=>store.set('by',$('#m-by').value.trim()));
+const applyBy=()=>{const n=NICK(),el=$('#m-by'),lb=document.querySelector('label[for=m-by]');if(n){el.value=n;el.readOnly=true;el.title='Your League nickname. Change it next to Sign out below.';if(lb)lb.textContent='Shared in the Monster Archive as'}else{el.readOnly=false;el.title='';if(lb)lb.textContent='Creator name shown in the Monster Archive';el.value=store.get('by','')}}; applyBy();$('#m-by').addEventListener('change',()=>{if(!NICK())store.set('by',$('#m-by').value.trim())});
 (async()=>{try{if(!window.claude||typeof claude.use!=='function'){setStat('The shared archive works on the published site.');return}
 const [db,u]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db){setStat('The Monster Archive is coming soon.');return}
 DB=db;if(u){try{ME=await u.id()}catch(e){}try{OWNER=!!(await u.isOwner())}catch(e){}try{CANW=await u.can('data.write')}catch(e){}}
@@ -1090,6 +1091,8 @@ $('#qr').innerHTML=items.map(([l,v,s2])=>`<li><small>${l}</small><b>${esc(v)}</b
 $('#qr-roll').onclick=quickRoll;
 const GENT=ORIG.find(m=>m.name==='The Grinning Gentleman');if(GENT)$('#gent-sb').innerHTML=sbHTML({...blank(),...GENT});
 $('#gent-fight').onclick=()=>{const f=E.foes.find(x=>x.name===GENT.name);if(f)f.n++;else E.foes.push({name:GENT.name,cr:GENT.cr,n:1});renderEncForm();calc();location.hash='#encounters';scrollTo({top:0});toast('The Gentleman tips his hat')};
+/* ---------- League nickname ---------- */
+window.addEventListener('lsd-nick',()=>{try{applyBy();renderSB();renderWCard();const n=NICK();if(n){let ch=false;Object.values(CHARS).forEach(c=>{if(!c.player){c.player=n;ch=true}});if(ch){saveChars();renderChars()}}}catch(e){}});
 /* ---------- boot ---------- */
 renderCats();roll();renderKept();loadForm();renderLib();renderEncForm();calc();renderBest();rollAll();rollLoot();renderChars();renderW();quickRoll();rollPlace();rollQuests();tvRoll();renderLookup();route();
 }

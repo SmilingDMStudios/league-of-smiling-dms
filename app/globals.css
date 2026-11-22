@@ -247,6 +247,7 @@ footer{text-align:center;color:var(--muted);font-size:14px;padding:20px}
 @media(max-width:900px){.cols,.ngrid{grid-template-columns:minmax(0,1fr)}.sticky{position:static}}
 @media(max-width:600px){.hd{gap:12px}.hd p{font-size:15px}.er{grid-template-columns:minmax(0,1fr) 70px 60px 44px}}
 
-.authbox{margin:0 0 10px}.authbox form{display:flex;gap:6px;flex-wrap:wrap}.authbox input{flex:1;min-width:180px}.authbox p{margin:0 0 6px;font-size:14px;color:var(--muted)}
+.authbox{margin:0 0 10px}.authbox form{display:block}.authbox .auth-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px}.authbox .auth-row input{flex:1;min-width:180px}.authbox form>input{margin-bottom:8px}.authbox .f .muted{font-weight:400;font-size:13px}.authbox small{display:block;font-size:13px}.authbox p{margin:0 0 6px;font-size:14px;color:var(--muted)}.authbox p b{color:var(--ink)}.authbox .bar{display:flex;gap:6px;flex-wrap:wrap}
+.made-by{margin:10px 0 0!important;padding-top:6px;border-top:1px solid rgba(156,43,27,.3);font-style:italic;font-size:13px;color:#7a200d;text-align:right}
 footer a{color:inherit}
 .boot-note{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#0b1810;color:#b9f36e;padding:8px 16px;border-radius:999px;font-weight:700;z-index:50}
